@@ -1,0 +1,58 @@
+# Version control
+.git
+.gitignore
+
+# Python cache files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Environment files
+.env
+dev.env
+*.env
+
+# Virtual environments
+venv/
+ENV/
+env/
+conda-env/
+
+# Results and data directories
+results/
+**/results/
+
+# Log files
+*.log
+logs/
+
+# Temporary files
+*.swp
+*.swo
+*~
+
+# Docker files
+.dockerignore
+
+# IDE files
+.idea/
+.vscode/
+*.sublime-workspace
+*.sublime-project

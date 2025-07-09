@@ -734,7 +734,11 @@ def extract_content_string(content):
 def run_analysis():
     # First get all user selections
     selections = get_user_selections()
+    run_analysis_with_selections(selections)
 
+
+def run_analysis_with_selections(selections):
+    """Run the trading agents analysis with the provided selections."""
     # Create config with selected research depth
     config = DEFAULT_CONFIG.copy()
     config["max_debate_rounds"] = selections["research_depth"]
@@ -1099,6 +1103,79 @@ def run_analysis():
 @app.command()
 def analyze():
     run_analysis()
+
+
+@app.command()
+def run(
+    ticker: str = typer.Argument(..., help="Stock ticker symbol to analyze"),
+    date: str = typer.Option(
+        datetime.datetime.now().strftime("%Y-%m-%d"), 
+        "--date", "-d", 
+        help="Analysis date in YYYY-MM-DD format"
+    ),
+    analysts: str = typer.Option(
+        "market,social,news,fundamentals",
+        "--analysts", "-a",
+        help="Comma-separated list of analysts to use: market (Market Analysis), social (Social Sentiment), news (News Analysis), fundamentals (Fundamentals Analysis)"
+    ),
+    research_depth: int = typer.Option(
+        1, 
+        "--depth", "-r", 
+        min=1, max=3, 
+        help="Research depth (number of debate rounds): 1=Quick, 2=Standard, 3=Deep"
+    ),
+    llm_provider: str = typer.Option(
+        "openai", 
+        "--provider", "-p",
+        help="LLM provider: openai, anthropic, google, ollama, openrouter"
+    ),
+    backend_url: str = typer.Option(
+        "https://api.openai.com/v1", 
+        "--backend-url", "-u",
+        help="API backend URL"
+    ),
+    shallow_thinker: str = typer.Option(
+        "gpt-4o-mini", 
+        "--shallow", "-s",
+        help="Model to use for quick thinking tasks"
+    ),
+    deep_thinker: str = typer.Option(
+        "o4-mini", 
+        "--deep", "-e",
+        help="Model to use for deep thinking tasks"
+    ),
+):
+    """
+    Run the TradingAgents analysis with command-line arguments.
+    This mode skips interactive selection and runs with the specified parameters.
+    """
+    # Convert analysts string to list of AnalystType
+    analyst_types = []
+    for analyst in analysts.lower().split(","):
+        analyst = analyst.strip()
+        if analyst == "market":
+            analyst_types.append(AnalystType.MARKET)
+        elif analyst == "social":
+            analyst_types.append(AnalystType.SOCIAL)
+        elif analyst == "news":
+            analyst_types.append(AnalystType.NEWS)
+        elif analyst == "fundamentals":
+            analyst_types.append(AnalystType.FUNDAMENTALS)
+    
+    # Create selections dictionary
+    selections = {
+        "ticker": ticker,
+        "analysis_date": date,
+        "analysts": analyst_types,
+        "research_depth": research_depth,
+        "llm_provider": llm_provider.lower(),
+        "backend_url": backend_url,
+        "shallow_thinker": shallow_thinker,
+        "deep_thinker": deep_thinker,
+    }
+    
+    # Run the same analysis flow as the interactive mode but with predefined selections
+    run_analysis_with_selections(selections)
 
 
 if __name__ == "__main__":
